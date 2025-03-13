@@ -2,3 +2,7 @@ Makefile
 build/
 dist/
 tmp/
+config.*
+.env
+*.tmp
+tmp.*

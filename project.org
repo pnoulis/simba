@@ -1,0 +1,57 @@
+* Project phases
+** Authoring phase
+*** User should be able to define CLI args
+
+*simba_define_cli_args*
+
+
+The cli argument name "$1" is persisted in an array.
+
+** Configuration phase
+** Build phase
+** Installation phase
+** Runtime
+* Common variables
+# Author
+PKG_AUTHOR_NAME="pavlos noulis"
+
+PKG_AUTHOR_ID="pnoulis"
+
+PKG_AUTHOR_EMAIL="pavlos.noulis@gmail.com"
+
+PKG_AUTHOR_HOME_URL="https://github.com/pnoulis"
+
+# Package
+PKG_NAME="template"
+
+PKG_ID="template"
+
+PKG_PRETTY_NAME="template"
+
+PKG_VERSION="0.0.1"
+
+PKG_VERSION_ID="0.0.1"
+
+PKG_VERSION_CODENAME="template"
+
+PKG_TARNAME="template-v0.0.1"
+
+PKG_REPOSITORY_TYPE="git"
+
+PKG_REPOSITORY_DOMAIN="github.com"
+
+PKG_REPONAME="template"
+
+PKG_REPOSITORY_PATH="pnoulis/template"
+
+PKG_REPOSITORY_URL="https://github.com/pnoulis/template"
+
+PKG_HOME_URL="https://github.com/pnoulis/template"
+
+PKG_DOCUMENTATION_URL="https://github.com/pnoulis/template#readme"
+
+PKG_BUG_REPORT_URL="https://github.com/pnoulis/template/issues"
+
+PKG_SUPPORT_URL="https://github.com/pnoulis/template"
+
+

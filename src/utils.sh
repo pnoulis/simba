@@ -1,65 +1,54 @@
-undefined() {
+simba_undefined() {
     return $(test -z "${!1+x}")
 }
 
-defined() {
+simba_defined() {
     return $(test -n "${!1+x}")
 }
 
-empty() {
+simba_empty() {
     return $(test -z "${1}")
 }
 
-nempty() {
+simba_nempty() {
     return $(test -n "${1}")
 }
 
-true() {
+simba_true() {
     return $(test "$1" == true || test "$1" == "0")
 }
 
-false() {
+simba_false() {
     return $(test "$1" == false || test "$1" == "1")
 }
 
-print() {
-    echo -e "${0}: $@"
-}
-
-debug() {
-    echo "$1":"$2"
-}
-
-debugv() {
-    echo $1:"${!1}"
-}
-
-fatal() {
+simba_fatal() {
     echo "$0:" "$@"
     exit 1
 }
 
-parse_param() {
-    _param=
-    local param arg
-    local -i toshift=0
+simba_reset_ifs() {
+    # IFS needs to be set, to space, tab, and newline, in precisely that order.
+    # (If _AS_PATH_WALK were called with IFS unset, it would have the
+    # side effect of setting IFS to empty, thus disabling word splitting.)
+    # Quoting is to prevent editors from complaining about space-tab.
+    as_nl='
+    '
+    export as_nl
+    IFS=" ""	$as_nl"
 
-    if (($# == 0)); then
-        return $toshift
-    elif [[ "$1" =~ .*=.* ]]; then
-        param="${1%%=*}"
-        arg="${1#*=}"
-    elif [[ "${2-}" =~ ^[^-].+ ]]; then
-        param="$1"
-        arg="$2"
-        ((toshift++))
-    fi
+    PS1='$ '
+    PS2='> '
+    PS4='+ '
 
+    # Ensure predictable behavior from utilities with locale-dependent output.
+    LC_ALL=C
+    export LC_ALL
+    LANGUAGE=C
+    export LANGUAGE
+}
 
-    if [[ -z "${arg-}" && ! "${OPTIONAL-}" ]]; then
-        fatal "${param:-$1} requires an argument"
-    fi
-
-    _param="${arg:-}"
-    return $toshift
+simba_log_configure_output() {
+    rm -f config.log
+    exec > >(tee config.log)
 }
