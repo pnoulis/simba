@@ -115,6 +115,10 @@ simba_cli_parse_options() {
                 usage
                 exit 0
                 ;;
+            -v | --version)
+                simba_print __APP_VERSION__
+                exit 0
+                ;;
             -[a-zA-Z][a-zA-Z]*)
                 local i="${1:-}"
                 shift
