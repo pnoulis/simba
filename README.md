@@ -1,7 +1,7 @@
 # Simple build automation (Simba)
 
-Simba is a script that generates a build system template. It is written
-in `bash`.
+Simba is a library of utilities and a script that generates a build
+system template. It is written in `bash`.
 
 It depends on:
 
