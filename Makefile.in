@@ -156,8 +156,7 @@ package: package.$$(archive)
 ##################################################
 # Install
 ##################################################
-install: install_program install_utilities install_templates \
-install_conf
+install: install_program install_utilities install_templates
 
 install_program: build
 	$(MKDIR) -p $(DESTDIR)$(bindir) 2>/dev/null
@@ -173,10 +172,6 @@ install_templates:
 	$(MKDIR) -p $(DESTDIR)$(datadir)/$(SIMBA_NAME) 2>/dev/null
 	$(CP) -r $(SRCDIR)/templates $(DESTDIR)$(datadir)/$(SIMBA_NAME)
 	$(CP) $(SRCDIR)/simba.conf $(DESTDIR)$(datadir)/$(SIMBA_NAME)
-
-install_conf:
-	$(MKDIR) -p $(DESTDIR)$(sysconfdir)/$(SIMBA_NAME) 2>/dev/null
-	$(CP) $(SRCDIR)/simba.conf $(DESTDIR)$(sysconfdir)/$(SIMBA_NAME)
 
 ##################################################
 # Uninstall
