@@ -1,4 +1,19 @@
-# Simple build automation (Simba)
+<a name='readme-top'></a>
+
+<br />
+<div align='center'>
+  <h3 align='center'>Simba</h3>
+  <p align='center'>
+    <em>Simple build automation</em>
+    <br/>
+  </p>
+</div>
+
+<div align='center'>
+  <img width="600px" height="300px" src='assets/simba-flies-away.gif' alt='Simbna gif'/>
+</div>
+
+# About
 
 Simba is a library of utilities and a script that generates a build
 system template. It is written in `bash`.
