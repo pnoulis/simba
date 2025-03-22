@@ -82,7 +82,7 @@ simba_array_for_each() {
 }
 
 simba_array_log() {
-    simba_array_for_each "$1" simba_debug
+    simba_array_for_each "$1" simba_print
 }
 
 # simba_array_find() {}

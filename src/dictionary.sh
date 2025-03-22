@@ -71,5 +71,5 @@ simba_dict_map() {
 }
 
 simba_dict_log() {
-    simba_dict_for_each "$1" simba_debug
+    simba_dict_for_each "$1" simba_print
 }
