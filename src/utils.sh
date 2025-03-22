@@ -27,6 +27,13 @@ simba_fatal() {
     exit 1
 }
 
+# $1 parameter must be quoted otherwise it will undergo expansion
+# before this function is invoked; meaning every space delimited text
+# within shall become a positional argument to the function: $1 -> $1,$2,$3...
+simba_trim() {
+    echo $1
+}
+
 simba_reset_ifs() {
     # IFS needs to be set, to space, tab, and newline, in precisely that order.
     # (If _AS_PATH_WALK were called with IFS unset, it would have the
