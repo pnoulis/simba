@@ -3,45 +3,45 @@
 # use array.sh
 # use dict.sh
 
-if simba_undefined SIMBA_CLI_ARGS; then
-    simba_dict_create SIMBA_CLI_ARGS
-fi
+# if simba_undefined SIMBA_CLI_ARGS; then
+#     simba_dict_create SIMBA_CLI_ARGS
+# fi
 
 simba_builtin_options() {
     local arg="$1"
     case "$arg" in
         --prefix | --prefix=*) ;;
-        --exec_prefix || --exec_prefix=*) ;;
-        --bindir || --bindir=*) ;;
-        --sbindir || --sbindir=*) ;;
-        --libexecdir || --libexecdir=*) ;;
-        --datarootdir || --datarootdir=*) ;;
-        --datadir || --datadir=*) ;;
-        --libdir || --libdir=*) ;;
-        --sysconfdir || --sysconfdir=*) ;;
-        --sharedstatedir || --sharedstatedir=*) ;;
-        --localstatedir || --localstatedir=*) ;;
-        --runstatedir || --runstatedir=*) ;;
-        --includedir || --includedir=*) ;;
-        --oldincludedir || --oldincludedir=*) ;;
-        --docdir || --docdir=*) ;;
-        --infodir || --infodir=*) ;;
-        --htmldir || --htmldir=*) ;;
-        --dvidir || --dvidir=*) ;;
-        --pdfdir || --pdfdir=*) ;;
-        --psdir || --psdir=*) ;;
-        --localedir || --localedir=*) ;;
-        --mandir || --mandir=*) ;;
-        --tmpdir || --tmpdir=*) ;;
-        --tmpdir_persistent || --tmpdir_persistent=*) ;;
-        --statedir || --statedir=*) ;;
-        --cachedir || --cachedir=*) ;;
-        --logdir || --logdir=*) ;;
-        --spooldir || --spooldir=*) ;;
-        --lockdir || --lockdir=*) ;;
-        --desktopdir || --desktopdir=*) ;;
-        --icondir || --icondir=*) ;;
-        --metainfodir || --metainfodir=*) ;;
+        --exec_prefix | --exec_prefix=*) ;;
+        --bindir | --bindir=*) ;;
+        --sbindir | --sbindir=*) ;;
+        --libexecdir | --libexecdir=*) ;;
+        --datarootdir | --datarootdir=*) ;;
+        --datadir | --datadir=*) ;;
+        --libdir | --libdir=*) ;;
+        --sysconfdir | --sysconfdir=*) ;;
+        --sharedstatedir | --sharedstatedir=*) ;;
+        --localstatedir | --localstatedir=*) ;;
+        --runstatedir | --runstatedir=*) ;;
+        --includedir | --includedir=*) ;;
+        --oldincludedir | --oldincludedir=*) ;;
+        --docdir | --docdir=*) ;;
+        --infodir | --infodir=*) ;;
+        --htmldir | --htmldir=*) ;;
+        --dvidir | --dvidir=*) ;;
+        --pdfdir | --pdfdir=*) ;;
+        --psdir | --psdir=*) ;;
+        --localedir | --localedir=*) ;;
+        --mandir | --mandir=*) ;;
+        --tmpdir | --tmpdir=*) ;;
+        --tmpdir_persistent | --tmpdir_persistent=*) ;;
+        --statedir | --statedir=*) ;;
+        --cachedir | --cachedir=*) ;;
+        --logdir | --logdir=*) ;;
+        --spooldir | --spooldir=*) ;;
+        --lockdir | --lockdir=*) ;;
+        --desktopdir | --desktopdir=*) ;;
+        --icondir | --icondir=*) ;;
+        --metainfodir | --metainfodir=*) ;;
         *) ;;
         esac
 }

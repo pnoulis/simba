@@ -1,17 +1,16 @@
 # use utils.sh
 
-if simba_undefined SIMBA_CONFIG_TIME_ENV; then
-    declare -gx SIMBA_CONFIG_TIME_ENV=""
-    declare -gx SIMBA_BUILD_TIME_ENV=""
-    declare -gx SIMBA_BUILD_TIME_M4_DEFINES=""
-fi
-
 simba_define_btime_envar_respectfully() {
     local name="$1"
     local value="${!name:-$2}"
     simba_define_btime_envar "$name" "$value"
 }
 simba_define_btime_envar() {
+    if simba_undefined SIMBA_CONFIG_TIME_ENV; then
+        declare -gx SIMBA_CONFIG_TIME_ENV=""
+        declare -gx SIMBA_BUILD_TIME_ENV=""
+        declare -gx SIMBA_BUILD_TIME_M4_DEFINES=""
+    fi
     local name="$1"
     local value="${2:-${!name}}"
     local name_uppercase="$(echo "$name" | tr [a-z] [A-Z])"
@@ -31,6 +30,12 @@ simba_define_ctime_envar_respectfully() {
     simba_define_ctime_envar "$name" "$value"
 }
 simba_define_ctime_envar() {
+    if simba_undefined SIMBA_CONFIG_TIME_ENV; then
+        declare -gx SIMBA_CONFIG_TIME_ENV=""
+        declare -gx SIMBA_BUILD_TIME_ENV=""
+        declare -gx SIMBA_BUILD_TIME_M4_DEFINES=""
+    fi
+
     local name="$1"
     local value="${2:-${!name}}"
     local name_uppercase="$(echo "$name" | tr [a-z] [A-Z])"

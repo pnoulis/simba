@@ -133,7 +133,7 @@ all: build
 build: $(BUILDIR)/$(SIMBA_NAME)
 
 $(BUILDIR)/$(SIMBA_NAME): $(SRCDIR)/*.sh simba.conf Makefile | $(BUILDIR_ABS)
-	$(M4) -I $(SRCDIR) $(M4_ENV_FLAGS) $(SRCDIR)/simba.sh > $@
+	$(M4) --prefix-builtins -I $(SRCDIR) $(M4_ENV_FLAGS) $(SRCDIR)/simba.sh > $@
 	$(CHMOD) 755 $@
 
 ##################################################
@@ -156,17 +156,16 @@ package: package.$$(archive)
 ##################################################
 # Install
 ##################################################
-install: install_program install_utilities install_templates
+install: install_program install_lib install_templates
 
 install_program: build
 	$(MKDIR) -p $(DESTDIR)$(bindir) 2>/dev/null
 	$(CP) $(BUILDIR)/$(SIMBA_NAME) $(DESTDIR)$(bindir)
 	$(CHMOD) 755 $(DESTDIR)$(bindir)/$(SIMBA_NAME)
 
-install_utilities:
+install_lib:
 	$(MKDIR) -p $(DESTDIR)$(datadir)/$(SIMBA_NAME) 2>/dev/null
-	$(CP) -r $(SRCDIR)/{array,buildir,cli-args,debug,dictionary,envars,installdirs-gnu,installdirs-xdg,os,url,utils,versions}.sh \
-	$(DESTDIR)$(datadir)/$(SIMBA_NAME)
+	$(CP) -r $(SRCDIR)/lib/*.sh $(DESTDIR)$(datadir)/$(SIMBA_NAME)
 
 install_templates:
 	$(MKDIR) -p $(DESTDIR)$(datadir)/$(SIMBA_NAME) 2>/dev/null
@@ -195,14 +194,10 @@ endif
 # Distclean
 ##################################################
 distclean: clean
-ifeq ($(APP_REPO_TYPE),git)
-	$(GIT) clean -fdx
-else
 	-$(RM) -f *.log
 	-$(RM) -f .#*
 	-$(RM) -f config.*
 	-$(RM) -f Makefile
-endif
 
 ##################################################
 # Environment

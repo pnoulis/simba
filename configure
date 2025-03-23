@@ -3,14 +3,14 @@ set -o errexit
 
 main() {
     SRCDIR_ABS="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
-    source ${SRCDIR_ABS}/src/debug.sh
-    source ${SRCDIR_ABS}/src/versions.sh
-    source ${SRCDIR_ABS}/src/utils.sh
-    source ${SRCDIR_ABS}/src/envars.sh
-    source ${SRCDIR_ABS}/src/os.sh
-    source ${SRCDIR_ABS}/src/buildir.sh
-    source ${SRCDIR_ABS}/src/installdirs-gnu.sh
-    source ${SRCDIR_ABS}/src/installdirs-xdg.sh
+    source ${SRCDIR_ABS}/src/lib/debug.sh
+    source ${SRCDIR_ABS}/src/lib/versions.sh
+    source ${SRCDIR_ABS}/src/lib/utils.sh
+    source ${SRCDIR_ABS}/src/lib/envars.sh
+    source ${SRCDIR_ABS}/src/lib/os.sh
+    source ${SRCDIR_ABS}/src/lib/buildir.sh
+    source ${SRCDIR_ABS}/src/lib/installdirs-gnu.sh
+    source ${SRCDIR_ABS}/src/lib/installdirs-xdg.sh
 
     # Author
     simba_define_btime_envar APP_AUTHOR_NAME "pavlos noulis"
@@ -148,7 +148,6 @@ simba_cli_parse_options() {
                 simba_cli_parse_param "$@" || shift $?
                 simba_define_btime_envar datadir "$_param"
                 ;;
-
             --buildir | --buildir=*)
                 simba_cli_parse_param "$@" || shift $?
                 simba_define_btime_envar BUILDIR_ABS "$(realpath -m "$_param")"

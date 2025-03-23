@@ -1,6 +1,11 @@
 #!/bin/bash
 set -o errexit
 
+m4_include(./lib/debug.sh)
+m4_include(./lib/mode.sh)
+m4_include(./lib/utils.sh)
+m4_include(./lib/array.sh)
+
 usage() {
     cat<<EOF
 NAME
@@ -12,54 +17,94 @@ SYNOPSIS
 EOF
 }
 
-
-include(./utils.sh)
-include(./debug.sh)
-
-if test __MODE__ == development; then
-    DATADIR=__SRCDIR_ABS__
-    USRCONFDIR=__SRCDIR_ABS__
-else
-    DATADIR=__DATADIR__/__PROGRAM_NAME__
-    USRCONFDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/__PROGRAM_NAME__"
-fi
+DEBUG=0
+DATADIR=__DATADIR__
+SHAREDLIBDIR=__DATADIR__/lib
+TEMPLATESDIR=__DATADIR__/templates
+SRCDIR=__SRCDIR_ABS__
 
 main() {
+    # Default values for user options
+    dependency_resolution_strategy=bundle
+    copy_lib_destination=
+    simba_debugv DATADIR
+    simba_debugv SHAREDLIBDIR
+
+    # Parse user options
     simba_cli_parse_options "$@"
     set -- "${POSARGS[@]}"
-
     destination="$(realpath -m "${1:-.}")"
     simba_debugv destination
-
     APP_ID="${destination##*/}"
     APP_NAME="$APP_ID"
     APP_PRETTY_NAME="$APP_ID"
-
     if ! test -d "$destination"; then
         mkdir -p "$destination"
     fi
 
     read_simba_conf
-    build_m4_flags
+    apply_dependency_resolution_strategy
     create_configure
+    create_configure_dev
     create_makefile_in
 }
 
+apply_dependency_resolution_strategy() {
+    dependencies=""
+    case $dependency_resolution_strategy in
+        bundle)
+            while IFS= read -r -d '' file; do
+                dependencies+="include($file) "
+            done < <(find "${SHAREDLIBDIR}" -type f -print0)
+            define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE "${dependencies[@]}"
+            define_btime_envar DEPENDENCY_RESOLUTION_SOURCE ""
+            ;;
+        system-lib)
+            while IFS= read -r -d '' file; do
+                dependencies+="source '$file'
+"
+            done < <(find "${SHAREDLIBDIR}" -type f -print0)
+            define_btime_envar DEPENDENCY_RESOLUTION_SOURCE "${dependencies[@]}"
+            define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE ""
+            ;;
+        local-lib)
+            if ! test -d "${destination}/${copy_lib_destination}"; then
+                mkdir -p "${destination}/${copy_lib_destination}"
+            fi
+            while IFS= read -r -d '' file; do
+                basename="${file##*/}"
+                cp "$file" "${destination}/${copy_lib_destination}"
+                dependencies+="source '${copy_lib_destination}/${basename}'
+"
+            done < <(find "${SHAREDLIBDIR}" -type f -print0)
+            define_btime_envar DEPENDENCY_RESOLUTION_SOURCE "${dependencies[@]}"
+            define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE ""
+            ;;
+    esac
+}
+
 read_simba_conf() {
+    if simba_mode_in_dev; then
+        USRCONFDIR=__SRCDIR_ABS__
+    else
+        USRCONFDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/__PROGRAM_NAME__"
+    fi
     local simbaconf="${USRCONFDIR}/simba.conf"
     local template_simbaconf="${DATADIR}/simba.conf"
 
-    if test -f "$simbaconf"; then
-        source "$simbaconf"
-    elif test __MODE__ == production; then
-        mkdir -p "$USRCONFDIR" 2>/dev/null
-        cp "$template_simbaconf" "$USRCONFDIR"
-        source "$simbaconf"
-    fi
-}
-
-build_m4_flags() {
-    M4FLAGS="-P -D__DATADIR__=$DATADIR -D__APP_AUTHOR_NAME__=$APP_AUTHOR_NAME -D__APP_AUTHOR_HOME_URL__=$APP_AUTHOR_HOME_URL -D__APP_AUTHOR_EMAIL__=$APP_AUTHOR_EMAIL -D__APP_AUTHOR_ID__=$APP_AUTHOR_ID -D__APP_REPO_TYPE__=$APP_REPO_TYPE -D__APP_HOME_URL__=$APP_HOME_URL -D__APP_DOCUMENTATION_URL__=$APP_DOCUMENTATION_URL -D__APP_BUG_REPORT_URL__=$APP_BUG_REPORT_URL -D__APP_SUPPORT_URL__=$APP_SUPPORT_URL -D__APP_REPO_URL__=$APP_REPO_URL -D__APP_NAME__=$APP_NAME -D__APP_ID__=$APP_ID -D__APP_PRETTY_NAME__=$APP_PRETTY_NAME"
+    define_btime_envar APP_NAME "$APP_NAME"
+    define_btime_envar APP_ID "$APP_ID"
+    define_btime_envar APP_PRETTY_NAME "$APP_PRETTY_NAME"
+    define_btime_envar APP_AUTHOR_NAME "$APP_AUTHOR_NAME"
+    define_btime_envar APP_AUTHOR_ID "$APP_AUTHOR_ID"
+    define_btime_envar APP_AUTHOR_EMAIL "$APP_AUTHOR_EMAIL"
+    define_btime_envar APP_AUTHOR_HOME_URL "$APP_AUTHOR_HOME_URL"
+    define_btime_envar APP_REPO_TYPE "$APP_REPO_TYPE"
+    define_btime_envar APP_REPO_URL "$APP_REPO_URL"
+    define_btime_envar APP_HOME_URL "$APP_HOME_URL"
+    define_btime_envar APP_DOCUMENTATION_URL "$APP_DOCUMENTATION_URL"
+    define_btime_envar APP_BUG_REPORT_URL "$APP_BUG_REPORT_URL"
+    define_btime_envar APP_SUPPORT_URL "$APP_SUPPORT_URL"
 }
 
 create_configure() {
@@ -68,8 +113,18 @@ create_configure() {
     if ! test -f "$template_configure"; then
         simba_fatal "${0}: Missing template path: ${template_configure}"
     fi
-    m4 $M4FLAGS "$template_configure" > "${destination}/configure"
+    m4 "${btime_macros[@]}" "$template_configure" > "${destination}/configure"
     chmod 744 "${destination}/configure"
+}
+
+create_configure_dev() {
+    local template_configure="${DATADIR}/templates/configure.dev"
+    simba_print "${0}: Creating configure.dev"
+    if ! test -f "$template_configure"; then
+        simba_fatal "${0}: Missing template path: ${template_configure}"
+    fi
+    cp "$template_configure" "${destination}/configure.dev"
+    chmod 744 "${destination}/configure.dev"
 }
 
 create_makefile_in() {
@@ -79,6 +134,22 @@ create_makefile_in() {
         simba_fatal "${0}: Missing template path: ${template_makefile_in}"
     fi
     cp "$template_makefile_in" "${destination}/Makefile.in"
+}
+
+define_btime_envar_respectfully() {
+    local name="$1"
+    local value="${!name:-$2}"
+    define_btime_envar "$name" "$value"
+}
+
+define_btime_envar() {
+    if simba_undefined btime_macros; then
+        btime_macros=()
+    fi
+    local name="$1"
+    local value="${2:-${!name}}"
+    local name_uppercase="$(echo "$name" | tr [a-z] [A-Z])"
+    btime_macros+=(-D__${name}__="$value")
 }
 
 simba_cli_parse_param() {
@@ -111,6 +182,20 @@ simba_cli_parse_options() {
     _param=
     while (($# > 0)); do
         case "${1:-}" in
+            --bundle)
+                dependency_resolution_strategy=bundle
+                ;;
+            --system-lib)
+                dependency_resolution_strategy=system-lib
+                ;;
+            --local-lib | --local-lib=*)
+                OPTIONAL=true simba_cli_parse_param "$@" || shift $?
+                dependency_resolution_strategy=local-lib
+                copy_lib_destination="${_param:-.simba}"
+                if [[ "$copy_lib_destination" =~ ^/*$ ]]; then
+                    simba_fatal "Library copy destination must be a relative path"
+                fi
+                ;;
             -h | --help)
                 usage
                 exit 0

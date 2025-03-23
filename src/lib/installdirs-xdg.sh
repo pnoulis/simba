@@ -2,25 +2,25 @@
 # https://specifications.freedesktop.org/basedir-spec/latest/
 # use envars
 
-# Standard XDG file permission
-simba_define_ctime_envar_respectfully XDG_PERMISSIONS 0700
-
-# Standard XDG base directory variables
-simba_define_ctime_envar_respectfully XDG_DATA_HOME "${XDG_DATA_HOME:-${HOME}/.local/share}"
-simba_define_ctime_envar_respectfully XDG_CONFIG_HOME "${XDG_CONFIG_HOME:-${HOME}/.config}"
-simba_define_ctime_envar_respectfully XDG_STATE_HOME "${XDG_STATE_HOME:-${HOME}/.local/state}"
-simba_define_ctime_envar_respectfully XDG_CACHE_HOME "${XDG_CACHE_HOME:-${HOME}/.cache}"
-simba_define_ctime_envar_respectfully XDG_RUNTIME_DIR "${XDG_RUNTIME_DIR:-/run}"
-
-# Standard XDG lookup paths
-# A lookup is performed in decreasing order of precedence starting with:
-# XDG_DATA_HOME, XDG_DATA_DIRS[0], XDG_DATA_DIRS[1],...
-# XDG_CONFIG_HOME, XDG_CONFIG_DIRS[0], XDG_CONFIG_DIRS[1],...
-simba_define_ctime_envar_respectfully XDG_DATA_DIRS "${XDG_DATA_DIRS:-'/usr/local/share/:/usr/share/'}"
-simba_define_ctime_envar_respectfully XDG_CONFIG_DIRS "${XDG_CONFIG_DIRS:-/etc/xdg}"
-
 simba_define_installdirs_xdg() {
-#	Root installation directory.
+    # Standard XDG file permission
+    simba_define_ctime_envar_respectfully XDG_PERMISSIONS 0700
+
+    # Standard XDG base directory variables
+    simba_define_ctime_envar_respectfully XDG_DATA_HOME "${XDG_DATA_HOME:-${HOME}/.local/share}"
+    simba_define_ctime_envar_respectfully XDG_CONFIG_HOME "${XDG_CONFIG_HOME:-${HOME}/.config}"
+    simba_define_ctime_envar_respectfully XDG_STATE_HOME "${XDG_STATE_HOME:-${HOME}/.local/state}"
+    simba_define_ctime_envar_respectfully XDG_CACHE_HOME "${XDG_CACHE_HOME:-${HOME}/.cache}"
+    simba_define_ctime_envar_respectfully XDG_RUNTIME_DIR "${XDG_RUNTIME_DIR:-/run}"
+
+    # Standard XDG lookup paths
+    # A lookup is performed in decreasing order of precedence starting with:
+    # XDG_DATA_HOME, XDG_DATA_DIRS[0], XDG_DATA_DIRS[1],...
+    # XDG_CONFIG_HOME, XDG_CONFIG_DIRS[0], XDG_CONFIG_DIRS[1],...
+    simba_define_ctime_envar_respectfully XDG_DATA_DIRS "${XDG_DATA_DIRS:-'/usr/local/share/:/usr/share/'}"
+    simba_define_ctime_envar_respectfully XDG_CONFIG_DIRS "${XDG_CONFIG_DIRS:-/etc/xdg}"
+
+    #	Root installation directory.
     simba_define_btime_envar_respectfully prefix	'${HOME}/.local'
     # Installation directory for binaries and libraries (architecture-dependent files).
     simba_define_btime_envar_respectfully exec_prefix	'${prefix}'

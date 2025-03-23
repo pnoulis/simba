@@ -55,3 +55,23 @@ PKG_BUG_REPORT_URL="https://github.com/pnoulis/template/issues"
 PKG_SUPPORT_URL="https://github.com/pnoulis/template"
 
 
+
+* TODO Use arrays not strings for handling build time macro definitions
+
+Use arrays not strings.
+
+M4 invocation works with dynamic flags works if these flags are held
+at an array. It does not work if they are within a string.
+
+this works:
+M4FLAGS=(-Done='a' -Dtwo='b' ...)
+M4FLAGS+=(-Dthree='c')
+m4 "${M4FLAGS[@]}"
+
+this does not work:
+M4FLAGS="-Done='a' -Dtwo='b' ..."
+M4FLAGS+="-Dthree='c'"
+m4 "${M4FLAGS}"
+
+Implementation at src/simba.sh
+define_btime_envar

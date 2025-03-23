@@ -1,14 +1,12 @@
-simba_in_debug_mode() {
-    return $(test -n "${DEBUG+x}" && (test "$DEBUG" == true || test "$DEBUG" == "0"))
-}
+# use mode.sh
 
 simba_debugv() {
-    ! simba_in_debug_mode && return
+    ! simba_mode_in_debug && return
     echo $1:"${!1}"
 }
 
 simba_debug() {
-    ! simba_in_debug_mode && return
+    ! simba_mode_in_debug && return
     echo -e "$@"
 }
 
