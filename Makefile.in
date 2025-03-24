@@ -130,10 +130,17 @@ all: build
 ##################################################
 # Build
 ##################################################
-build: $(BUILDIR)/$(SIMBA_NAME)
+build: lib-bin simba
 
+simba: $(BUILDIR)/$(SIMBA_NAME)
 $(BUILDIR)/$(SIMBA_NAME): $(SRCDIR)/*.sh simba.conf Makefile | $(BUILDIR_ABS)
 	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $(SRCDIR)/simba.sh > $@
+	$(CHMOD) 755 $@
+
+lib-bin: sqlite3-helper
+sqlite3-helper: $(BUILDIR)/sqlite3-helper
+$(BUILDIR)/sqlite3-helper: $(SRCDIR)/lib-bin/sqlite3-helper.sh | $(BUILDIR_ABS)
+	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $^ > $@
 	$(CHMOD) 755 $@
 
 ##################################################
@@ -188,6 +195,7 @@ ifneq ($(BUILDIR),$(BUILDROOTDIR))
 	-$(RM) -fr $(BUILDIR)
 else
 	-$(RM) -f $(SIMBA_NAME)
+	-$(RM) -f sqlite3-helper
 endif
 
 ##################################################

@@ -75,3 +75,6 @@ m4 "${M4FLAGS}"
 
 Implementation at src/simba.sh
 define_btime_envar
+
+* TODO Move resolving os dependencies after getting user input
+* TODO Design a better interface for declaring user options
