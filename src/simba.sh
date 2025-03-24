@@ -5,6 +5,7 @@ m4_include(./lib/debug.sh)
 m4_include(./lib/mode.sh)
 m4_include(./lib/utils.sh)
 m4_include(./lib/array.sh)
+m4_include(./dirs.sh)
 
 usage() {
     cat<<EOF
@@ -18,17 +19,13 @@ EOF
 }
 
 DEBUG=0
-DATADIR=__DATADIR__
-SHAREDLIBDIR=__DATADIR__/lib
-TEMPLATESDIR=__DATADIR__/templates
-SRCDIR=__SRCDIR_ABS__
-
 main() {
     # Default values for user options
     dependency_resolution_strategy=bundle
     copy_lib_destination=
     simba_debugv DATADIR
     simba_debugv SHAREDLIBDIR
+    simba_debugv TEMPLATESDIR
 
     # Parse user options
     simba_cli_parse_options "$@"
@@ -55,7 +52,7 @@ apply_dependency_resolution_strategy() {
         bundle)
             while IFS= read -r -d '' file; do
                 dependencies+="include($file) "
-            done < <(find "${SHAREDLIBDIR}" -type f -print0)
+            done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
             define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE "${dependencies[@]}"
             define_btime_envar DEPENDENCY_RESOLUTION_SOURCE ""
             ;;
@@ -63,7 +60,7 @@ apply_dependency_resolution_strategy() {
             while IFS= read -r -d '' file; do
                 dependencies+="source '$file'
 "
-            done < <(find "${SHAREDLIBDIR}" -type f -print0)
+            done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
             define_btime_envar DEPENDENCY_RESOLUTION_SOURCE "${dependencies[@]}"
             define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE ""
             ;;
@@ -76,7 +73,7 @@ apply_dependency_resolution_strategy() {
                 cp "$file" "${destination}/${copy_lib_destination}"
                 dependencies+="source '${copy_lib_destination}/${basename}'
 "
-            done < <(find "${SHAREDLIBDIR}" -type f -print0)
+            done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
             define_btime_envar DEPENDENCY_RESOLUTION_SOURCE "${dependencies[@]}"
             define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE ""
             ;;
@@ -84,13 +81,17 @@ apply_dependency_resolution_strategy() {
 }
 
 read_simba_conf() {
-    if simba_mode_in_dev; then
-        USRCONFDIR=__SRCDIR_ABS__
-    else
-        USRCONFDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/__PROGRAM_NAME__"
-    fi
     local simbaconf="${USRCONFDIR}/simba.conf"
-    local template_simbaconf="${DATADIR}/simba.conf"
+    local simbaconf_template="${TEMPLATESDIR}/simba.conf"
+
+    if ! test -f "$simbaconf"; then
+        if ! test -d "$USRCONFDIR"; then
+            USRCONFDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/simba"
+            simbaconf="${USRCONFDIR}/simba.conf"
+        fi
+        cp "$simbaconf_template" "$USRCONFDIR"
+    fi
+    source "$simbaconf"
 
     define_btime_envar APP_NAME "$APP_NAME"
     define_btime_envar APP_ID "$APP_ID"
@@ -108,7 +109,7 @@ read_simba_conf() {
 }
 
 create_configure() {
-    local template_configure="${DATADIR}/templates/configure"
+    local template_configure="${TEMPLATESDIR}/configure"
     simba_print "${0}: Creating configure"
     if ! test -f "$template_configure"; then
         simba_fatal "${0}: Missing template path: ${template_configure}"
@@ -118,7 +119,7 @@ create_configure() {
 }
 
 create_configure_dev() {
-    local template_configure="${DATADIR}/templates/configure.dev"
+    local template_configure="${TEMPLATESDIR}/configure.dev"
     simba_print "${0}: Creating configure.dev"
     if ! test -f "$template_configure"; then
         simba_fatal "${0}: Missing template path: ${template_configure}"
@@ -128,7 +129,7 @@ create_configure_dev() {
 }
 
 create_makefile_in() {
-    local template_makefile_in="${DATADIR}/templates/Makefile.in"
+    local template_makefile_in="${TEMPLATESDIR}/Makefile.in"
     simba_print "${0}: Creating Makefile.in"
     if ! test -f "$template_makefile_in"; then
         simba_fatal "${0}: Missing template path: ${template_makefile_in}"

@@ -2,7 +2,7 @@
 set -o errexit
 
 __DEPENDENCY_RESOLUTION_SOURCE__ dnl
-changequote([[, ]])dnl
+changequote([[[, ]]])dnl
 
 usage() {
     echo 'usage'
@@ -73,13 +73,13 @@ main() {
 
 simba_create_macrosfile() {
     simba_print "Creating macrosfile...|$SIMBA_CONFIG_MACROSFILE"
-    echo "[[changequote([[[, ]]])dnl]]" > $SIMBA_CONFIG_MACROSFILE
-    echo "[[changecom([[[/*/]]], [[[*//]]])dnl]]" >> $SIMBA_CONFIG_MACROSFILE
+    echo "[[[changequote([[[, ]]])dnl]]]" > $SIMBA_CONFIG_MACROSFILE
+    echo "[[[changecom([[[/*/]]], [[[*//]]])dnl]]]" >> $SIMBA_CONFIG_MACROSFILE
     while IFS='=' read -r name value; do
-        echo "[[define([[[$name]]], [[[$value]]])dnl]]" >> $SIMBA_CONFIG_MACROSFILE
+        echo "[[[define([[[$name]]], [[[$value]]])dnl]]]" >> $SIMBA_CONFIG_MACROSFILE
     done <<< "$SIMBA_CONFIG_TIME_ENV"
-    echo "[[define([[[__BUILD_TIME_ENV_M4_DEFINES__]]], [[[$SIMBA_BUILD_TIME_ENV_M4_DEFINES]]])dnl]]" >> $SIMBA_CONFIG_MACROSFILE
-    echo "[[define([[[__BUILD_TIME_ENV__]]], [[[\"$SIMBA_BUILD_TIME_ENV\"]]])dnl]]" >> $SIMBA_CONFIG_MACROSFILE
+    echo "[[[define([[[__BUILD_TIME_ENV_M4_DEFINES__]]], [[[$SIMBA_BUILD_TIME_ENV_M4_DEFINES]]])dnl]]]" >> $SIMBA_CONFIG_MACROSFILE
+    echo "[[[define([[[__BUILD_TIME_ENV__]]], [[[\"$SIMBA_BUILD_TIME_ENV\"]]])dnl]]]" >> $SIMBA_CONFIG_MACROSFILE
 }
 
 simba_create_makefile() {

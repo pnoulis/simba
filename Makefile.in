@@ -133,7 +133,7 @@ all: build
 build: $(BUILDIR)/$(SIMBA_NAME)
 
 $(BUILDIR)/$(SIMBA_NAME): $(SRCDIR)/*.sh simba.conf Makefile | $(BUILDIR_ABS)
-	$(M4) --prefix-builtins -I $(SRCDIR) $(M4_ENV_FLAGS) $(SRCDIR)/simba.sh > $@
+	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $(SRCDIR)/simba.sh > $@
 	$(CHMOD) 755 $@
 
 ##################################################
@@ -164,21 +164,21 @@ install_program: build
 	$(CHMOD) 755 $(DESTDIR)$(bindir)/$(SIMBA_NAME)
 
 install_lib:
-	$(MKDIR) -p $(DESTDIR)$(datadir)/$(SIMBA_NAME) 2>/dev/null
-	$(CP) -r $(SRCDIR)/lib/*.sh $(DESTDIR)$(datadir)/$(SIMBA_NAME)
+	$(MKDIR) -p $(DESTDIR)$(datadir)/simba 2>/dev/null
+	$(CP) -r $(SRCDIR)/lib/*.sh $(DESTDIR)$(datadir)/simba
 
 install_templates:
 	$(MKDIR) -p $(DESTDIR)$(datadir)/$(SIMBA_NAME) 2>/dev/null
-	$(CP) -r $(SRCDIR)/templates $(DESTDIR)$(datadir)/$(SIMBA_NAME)
-	$(CP) $(SRCDIR)/simba.conf $(DESTDIR)$(datadir)/$(SIMBA_NAME)
+	$(CP) -r $(SRCDIR)/templates $(DESTDIR)$(datadir)/simba
+	$(CP) $(SRCDIR)/simba.conf $(DESTDIR)$(datadir)/simba/templates
 
 ##################################################
 # Uninstall
 ##################################################
 uninstall:
 	-$(RM) -f $(DESTDIR)$(bindir)/$(SIMBA_NAME)
-	-$(RM) -fr $(DESTDIR)$(datadir)/$(SIMBA_NAME)
-	-$(RM) -fr $(DESTDIR)$(sysconfdir)/$(SIMBA_NAME)
+	-$(RM) -fr $(DESTDIR)$(datadir)/simba
+	-$(RM) -fr $(DESTDIR)$(sysconfdir)/simba
 
 ##################################################
 # Clean
