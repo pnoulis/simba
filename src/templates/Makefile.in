@@ -162,6 +162,11 @@ uninstall:
 # Clean
 ##################################################
 clean:
+ifneq ($(BUILDIR),$(BUILDROOTDIR))
+	-$(RM) -fr $(BUILDIR)
+else
+	@echo nothing to clean
+endif
 
 ##################################################
 # Distclean

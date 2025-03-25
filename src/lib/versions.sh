@@ -90,8 +90,14 @@ simba_compare_versions() {
     read -a version_required < <(echo "$3" | cut -d'.' -f1-3 | tr '.' ' ')
 
     # major = 0, minor = 1, patch = 2
+    # major = 0, minor = 1, patch = 2
     for i in 0 1 2; do
-        [[ "${version_required[i]:-*}" == '*' ]] && continue
-        (( "${version_installed[i]}" $logical_operator "${version_required[i]}" )) || return 1
+        [[ ${version_required[i]:-*} == '*' ]] && continue
+        case $logical_operator in
+            \>= | \<=) test $i -gt 0 && return 0 ;;
+        esac
+        if ! (( ${version_installed[i]} $logical_operator ${version_required[i]} )); then
+            return 1
+        fi
     done
 }
