@@ -1,12 +1,6 @@
 #!/bin/bash
 set -o errexit
 
-m4_include(./lib/debug.sh)
-m4_include(./lib/mode.sh)
-m4_include(./lib/utils.sh)
-m4_include(./lib/array.sh)
-m4_include(./dirs.sh)
-
 usage() {
     cat<<EOF
 NAME
@@ -15,10 +9,28 @@ NAME
 SYNOPSIS
     ${0} [...OPTIONS] destination
 
+EXAMPLES
+    This is the default operation. The configure script shall be self
+    contained. All of its dependecies will be inlined.
+    ${0} --bundle
+
+    Instead of inlining the dependencies copies them over to
+    destination/.simba. The configure script is modified to reference
+    the local copy of its dependencies.
+    ${0} --local-lib
+
+    Define the installation directory of the local utility copies
+    ${0} --local-lib=scripts
+
+    Do not bundle nor make copies; instead look for them at
+    the DATADIR defined at build time (usally at /usr/local/share/simba)
+    ${0} --system-lib
+
 EOF
 }
 
-DEBUG=0
+DEBUG=1
+MODE=__MODE__
 main() {
     # Default values for user options
     dependency_resolution_strategy=bundle
@@ -26,6 +38,8 @@ main() {
     simba_debugv DATADIR
     simba_debugv SHAREDLIBDIR
     simba_debugv TEMPLATESDIR
+    simba_debugv dependency_resolution_strategy
+    simba_debugv copy_lib_destination
 
     # Parse user options
     simba_cli_parse_options "$@"
@@ -53,31 +67,28 @@ apply_dependency_resolution_strategy() {
             while IFS= read -r -d '' file; do
                 dependencies+="include($file) "
             done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
-            define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE "${dependencies[@]}"
-            define_btime_envar DEPENDENCY_RESOLUTION_SOURCE ""
             ;;
         system-lib)
             while IFS= read -r -d '' file; do
                 dependencies+="source '$file'
 "
             done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
-            define_btime_envar DEPENDENCY_RESOLUTION_SOURCE "${dependencies[@]}"
-            define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE ""
             ;;
         local-lib)
+            simba_print "${0}: Copying over libraries"
             if ! test -d "${destination}/${copy_lib_destination}"; then
                 mkdir -p "${destination}/${copy_lib_destination}"
             fi
+
             while IFS= read -r -d '' file; do
                 basename="${file##*/}"
                 cp "$file" "${destination}/${copy_lib_destination}"
                 dependencies+="source '${copy_lib_destination}/${basename}'
 "
             done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
-            define_btime_envar DEPENDENCY_RESOLUTION_SOURCE "${dependencies[@]}"
-            define_btime_envar DEPENDENCY_RESOLUTION_BUNDLE ""
             ;;
     esac
+    define_btime_envar DEPENDENCIES "${dependencies[@]}"
 }
 
 read_simba_conf() {
@@ -231,5 +242,11 @@ simba_cli_parse_options() {
     done
     unset _param
 }
+
+m4_include(__SRCDIR__/lib/debug.sh)
+m4_include(__SRCDIR__/lib/mode.sh)
+m4_include(__SRCDIR__/lib/utils.sh)
+m4_include(__SRCDIR__/lib/array.sh)
+m4_include(__SRCDIR__/dirs.sh)
 
 main "$@"

@@ -99,6 +99,8 @@ simba # -> simba generates a configure and Makefile.in at the current working di
 simba ./my-project # -> simba generates a configure and Makefile.in with 'my-project'
 simba --help # -> an outline of the command and options
 simba --version # -> get simba's installed version
+
+# Also check simba --help
 ```
 
 ## Contributing

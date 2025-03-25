@@ -9,3 +9,4 @@ else
     TEMPLATESDIR=__DATADIR__/templates
     USRCONFDIR=__SRCDIR_ABS__
 fi
+

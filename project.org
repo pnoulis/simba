@@ -78,3 +78,21 @@ define_btime_envar
 
 * TODO Move resolving os dependencies after getting user input
 * TODO Design a better interface for declaring user options
+* TODO Implement the --force option
+By default simba should respect files in the destination that would
+otherwise be overridden by its operations.
+
+It should display an appropriate message when it comes across files
+that would be overridden in both cases (--force and not --force)
+
+The --force option will circumvent such safeguards and instead
+override matching files in the destination.
+
+Together with the --force option i should also implement the
+--interactive option.
+
+* TODO Implement the --diff option
+
+In case of a file collision in the destination this option will enable
+the generation of a diff so that the user may examine it. Although
+this is what git is for isnt it?

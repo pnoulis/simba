@@ -1,7 +1,6 @@
 #!/bin/bash
 set -o errexit
 
-__DEPENDENCY_RESOLUTION_SOURCE__ dnl
 changequote([[[, ]]])dnl
 
 usage() {
@@ -193,6 +192,6 @@ simba_cli_parse_options() {
     unset _param
 }
 
-__DEPENDENCY_RESOLUTION_BUNDLE__ dnl
+__DEPENDENCIES__ dnl
 
 main "$@"

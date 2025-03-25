@@ -130,23 +130,26 @@ all: build
 ##################################################
 # Build
 ##################################################
-build: lib-bin simba
+build: _simba
 
-simba: $(BUILDIR)/$(SIMBA_NAME)
-$(BUILDIR)/$(SIMBA_NAME): $(SRCDIR)/*.sh simba.conf Makefile | $(BUILDIR_ABS)
-	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $(SRCDIR)/simba.sh > $@
+_simba: $(BUILDIR)/$(SIMBA_NAME)
+$(BUILDIR)/$(SIMBA_NAME): simba.sh $(SRCDIR)/lib/*.sh \
+	simba.conf Makefile | $(BUILDIR_ABS)
+	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $< > $@
 	$(CHMOD) 755 $@
 
-lib-bin: sqlite3-helper
-sqlite3-helper: $(BUILDIR)/sqlite3-helper
-$(BUILDIR)/sqlite3-helper: $(SRCDIR)/lib-bin/sqlite3-helper.sh | $(BUILDIR_ABS)
-	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $^ > $@
+lib-bin: _sqlite3-helper
+_sqlite3-helper: $(BUILDIR)/sqlite3-helper
+$(BUILDIR)/sqlite3-helper: $(SRCDIR_ABS)/lib-bin/sqlite3-helper.sh $(SRCDIR)/lib/*.sh \
+	Makefile | $(BUILDIR_ABS)
+	$(M4) --prefix-builtins -I$(SRCDIR) $(M4_ENV_FLAGS) $< > $@
 	$(CHMOD) 755 $@
 
 ##################################################
 # Release
 ##################################################
 release:
+	@echo $(installdirs)
 
 ##################################################
 # Distribute source tree
@@ -163,12 +166,15 @@ package: package.$$(archive)
 ##################################################
 # Install
 ##################################################
-install: install_program install_lib install_templates
+install: install_program install_lib install_templates \
+	install_lib_bin
 
-install_program: build
-	$(MKDIR) -p $(DESTDIR)$(bindir) 2>/dev/null
+install_program: simba
 	$(CP) $(BUILDIR)/$(SIMBA_NAME) $(DESTDIR)$(bindir)
-	$(CHMOD) 755 $(DESTDIR)$(bindir)/$(SIMBA_NAME)
+
+install_lib_bin: lib-bin
+	$(MKDIR) -p $(DESTDIR)$(datadir)/simba 2>/dev/null
+	$(CP) $(BUILDIR)/sqlite3-helper $(DESTDIR)$(datadir)/simba
 
 install_lib:
 	$(MKDIR) -p $(DESTDIR)$(datadir)/simba 2>/dev/null
@@ -227,6 +233,9 @@ $(DOTENVFILE): $(CONFIG_MAKEFILE_IN)
 ##################################################
 $(BUILDIR_ABS):
 	$(MKDIR) -p $@ 2>/dev/null
+
+$(installdirs):
+	@echo should make $@
 
 ##################################################
 # help

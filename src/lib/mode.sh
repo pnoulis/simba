@@ -1,17 +1,17 @@
 simba_mode_in_dev() {
-    return $(test __MODE__ == dev || test __MODE__ == development)
+    return $(test "$MODE" == dev || test "$MODE" == development)
 }
 
 simba_mode_in_test() {
-    return $(test __MODE__ == test)
+    return $(test "$MODE" == test)
 }
 
 simba_mode_in_stag() {
-    return $(test __MODE__ == stag || test __MODE__ == staging)
+    return $(test "$MODE" == stag || test "$MODE" == staging)
 }
 
 simba_mode_in_prod() {
-    return $(test __MODE__ == prod || test __MODE__ == production)
+    return $(test "$MODE" == prod || test "$MODE" == production)
 }
 
 simba_mode_in_debug() {
