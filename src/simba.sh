@@ -98,6 +98,7 @@ read_simba_conf() {
     if ! test -f "$simbaconf"; then
         if ! test -d "$USRCONFDIR"; then
             USRCONFDIR="${XDG_CONFIG_HOME:-${HOME}/.config}/simba"
+            mkdir -p "$USRCONFDIR"
             simbaconf="${USRCONFDIR}/simba.conf"
         fi
         cp "$simbaconf_template" "$USRCONFDIR"
