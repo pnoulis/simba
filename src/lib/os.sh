@@ -65,9 +65,6 @@ simba_resolve_os_dependencies() {
   simba_is_command_installed chown
   simba_define_ctime_envar_respectfully CHOWN $command_path
 
-  simba_is_command_installed which
-  simba_define_ctime_envar_respectfully WHICH $command_path
-
   simba_is_command_installed uname
   simba_define_ctime_envar_respectfully UNAME $command_path
 
