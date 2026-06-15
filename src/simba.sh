@@ -22,6 +22,9 @@ EXAMPLES
     Define the installation directory of the local utility copies
     ${0} --local-lib=scripts
 
+    Make use of an already installed instance of the .simba libraries
+    ${0} --shared-lib=./path/to/.simba
+
     Do not bundle nor make copies; instead look for them at
     the DATADIR defined at build time (usally at /usr/local/share/simba)
     ${0} --system-lib
@@ -83,6 +86,17 @@ apply_dependency_resolution_strategy() {
             while IFS= read -r -d '' file; do
                 basename="${file##*/}"
                 cp "$file" "${destination}/${copy_lib_destination}"
+                dependencies+="source '${copy_lib_destination}/${basename}'
+"
+            done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
+            ;;
+        shared-lib)
+            simba_print "${0}: Using shared libraries"
+            if ! test -d "${destination}/${copy_lib_destination}"; then
+                simba_fatal "${0}: Missing shared library path: ${template_configure}"
+            fi
+            while IFS= read -r -d '' file; do
+                basename="${file##*/}"
                 dependencies+="source '${copy_lib_destination}/${basename}'
 "
             done < <(find "${SHAREDLIBDIR}" -type d -iname 'templates' -prune -o -type f -print0)
@@ -205,6 +219,14 @@ simba_cli_parse_options() {
                 OPTIONAL=true simba_cli_parse_param "$@" || shift $?
                 dependency_resolution_strategy=local-lib
                 copy_lib_destination="${_param:-.simba}"
+                if [[ "$copy_lib_destination" =~ ^/*$ ]]; then
+                    simba_fatal "Library copy destination must be a relative path"
+                fi
+                ;;
+            --shared-lib | --shared-lib=*)
+                OPTIONAL=true simba_cli_parse_param "$@" || shift $?
+                dependency_resolution_strategy=shared-lib
+                copy_lib_destination="$_param"
                 if [[ "$copy_lib_destination" =~ ^/*$ ]]; then
                     simba_fatal "Library copy destination must be a relative path"
                 fi
